@@ -3,6 +3,7 @@ resource "aws_instance" "cloud-init" {
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.cloud-init-sg.id]
+  user_data              = file("../cloud-init/user-data.yaml")
 
   tags = {
     Name = "example-instance"
@@ -44,6 +45,14 @@ resource "aws_vpc_security_group_ingress_rule" "HTTP" {
   to_port           = 80
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_ssh" {
+  security_group_id = aws_security_group.cloud-init-sg.id
+  cidr_ipv4         = var.my_ip
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
   security_group_id = aws_security_group.cloud-init-sg.id
@@ -67,7 +76,7 @@ resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block = "0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
   }
 }
