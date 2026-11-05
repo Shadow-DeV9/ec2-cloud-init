@@ -4,6 +4,8 @@ resource "aws_instance" "cloud-init" {
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.cloud-init-sg.id]
   user_data              = file("../cloud-init/user-data.yaml")
+  key_name               = "ec2-cloud-init-key"
+
 
   tags = {
     Name = "example-instance"
